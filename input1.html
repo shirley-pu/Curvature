@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="math.js"></script>
+        <script src="Curvature.js"></script>
+    </head>
+    <body>
+        <form id="frm1" action="Curvature.js">
+            <table width="350px" border="1px">
+                <tr>
+                    <th colspan="2">Parameters</th>
+                </tr>
+                <tr>
+                    <td>d0</td>
+                    <td>
+                    <input type="number" step= "any" id="d0" name="d0" value="2.85">nm</td>
+                </tr>
+                <tr>
+                    <td>l</td>
+                    <td> <input type="number" step= "any" id="l" name="l" value="2.17">nm</td>
+                </tr>
+                <tr>
+                    <td>r0</td>
+                    <td> <input type="number" step= "any" id="r0" name="r0" value="1">nm</td>
+                </tr>
+                <tr>
+                    <td>c0</td>
+                    <td> <input type="number" step= "any" id="c0" name="c0" value="0">nm</td>
+                </tr>
+                <tr>
+                    <td>Ka</td>
+                    <td> <input type="number" step= "any" id="Ka" name="Ka" value="1.425E02">nm</td>
+                </tr>
+                <tr>
+                    <td>Kc</td>
+                    <td> <input type="number" step= "any" id="Kc" name="Kc" value="2.85E01">nm</td>
+                </tr>
+                <tr>
+                    <td>Kg</td>
+                    <td> <input type="number" step= "any" id="Kg" name="Kg" value="7.125E-02">nm</td>
+                </tr>
+                <tr>
+                    <td>alpha</td>
+                    <td> <input type="number" step= "any" id="alpha" name="alpha" value="3">nm</td>
+                </tr>
+                <tr>
+                    <td>s</td>
+                    <td> <input type="number" step= "any" id="s" name="s" value="0"> nm</td>
+                </tr>
+            </table>
+            <input type="checkbox" id="r0_checkbox" name="r0_checkbox">
+            <label for="r0_checkbox"> Adjust r0 to maintain constant volume</label>
+
+            <div>
+                <input type="radio" id="sRelaxed_button" name="s_buttons" value="sRelaxed_button">
+                <label for="sRelaxed_button">Use s_relaxed condition</label>
+            </div>
+
+            <div>
+                <input type="radio" id="sConstrained_button" name="s_buttons" value="sConstrained_button">
+                <label for="sConstrained_button">Use s_constrained condition</label>
+            </div>
+
+            <div>
+                <input type="radio" id="sManual_button" name="s_buttons" value="sManual_button">
+                <label for="sManual_button">Set s value manually</label>
+            </div>
+
+            <button type="button" id="button">Calculate deltaG<SUB>deformation</SUB></button>
+            <input type="number" id="gdef_1" name="gdef" readonly>
+            <label for="gdef_1">deltaG_deformation</label>
+
+        </form>
+
+        <script>
+            function getdeltaGdef_old(){
+    var changeParams=4.114;
+    var imagErrorThreshold=Math.pow(10,-10)
+
+//Can use "Document.querySelector()"
+
+    var d0=document.getElementById("d0").value;
+    var l=document.getElementById("l").value;
+    var r0=document.getElementById("r0").value;
+    var ka=document.getElementById("Ka").value;
+    var kc=document.getElementById("Kc").value;
+    var kg=document.getElementById("Kg").value;
+    var alpha=document.getElementById("alpha").value;
+    var s=document.getElementById("s").value;
+    var c0=document.getElementById("c0").value;
+
+    var u0=div(div(d0,l),2);
+    
+    var gamma=alpha/kc;
+    var beta=(4*ka)/(d0*d0*kc);
+    
+
+    var temp=sqrt(complex((gamma*gamma)-(4*beta),0));
+    return(complex((gamma*gamma)-(4*beta),0));
+    var kp2=div(add(complex(gamma,0),temp),2);
+    var kn2=div(sub(complex(gamma,0),temp),2);
+    var kp=sqrt(kp2);
+    var kn=sqrt(kn2);
+
+    // Kkpr0 and Kknr0 are 2 x 2 arrays;
+    // array[1] is real and imaginary of besselk order 0 
+    // array [2] is real [1] and imaginary [2] of besselk order 1 
+
+    function getBessel(x){
+        let bessel=[besselK(0,x),besselK(1,x)]
+        return bessel
+    }
+
+    return(temp.re);
+}
+        </script>
+
+    <script>
+        document.write(besselK(1,1));
+        document.getElementById('button').addEventListener('click', function() {
+            document.getElementById('gdef_1').value=document.write(getdeltaGdef_old(1));
+});
+    </script>
+    </body>
+</html>
