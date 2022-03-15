@@ -94,9 +94,9 @@
     var gamma=alpha/kc;
     var beta=(4*ka)/(d0*d0*kc);
 
-    var temp=sqrt(complex((gamma*gamma)-(4*beta),0));
-    var kp2=div(add(complex(gamma,0),temp),2);
-    var kn2=div(sub(complex(gamma,0),temp),2);
+    var temp=sqrt((gamma*gamma)-(4*beta));
+    var kp2=div(add(gamma,temp),2);
+    var kn2=div(sub(gamma,temp),2);
     var kp=sqrt(kp2);
     var kn=sqrt(kn2);
 
@@ -120,7 +120,7 @@
     temp=add(temp,re(mul(mul(gamma,u0),s)));
     var res=mul(mul(temp,(-Math.PI)),mul(r0,kc));
 
-    if (abs(imag(res))>imagErrorThreshold) {throw new Exception("Error the free energy has a non zero imaginary part of=" + imag(res));}
+    //if (abs(res.im))>imagErrorThreshold) {throw new Exception("Error the free energy has a non zero imaginary part of=" + imag(res));}
     return re(res)/changeParams;
 }
         </script>
