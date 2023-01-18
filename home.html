@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="Javascript app for calculating energetics of membrane inclusion-induced bilayer deformations">
+    <meta name="author" content="Shirley Pu"
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    
+    <!-- Plotly used for plots -->
+    <script src="https://cdn.plot.ly/plotly-2.16.1.min.js"></script>
+
+    <!-- Scripts used for functions. Sourced after all parameters are loaded -->
+    <script src="functions.js"></script>
+
+    <!-- Javascript library used for math -->
+    <script src="math.js"></script>
+    
+    <!--<link rel="stylesheet" type="text/css" href="test.css">-->
+      <title>Energetics of Inclusion-Induced Bilayer Deformations</title>
+  </head>
+  <body>
+    <h1>Energetics of Inclusion-Induced Bilayer Deformations</h1>
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    -->
+    <div class="container">
+      <div class="row">
+        <div class="col-md-auto">
+          <form id="mainfrm">
+            <table width="300px" border="1px">
+                <tr>
+                    <th colspan="2">Parameters</th>
+                </tr>
+                <tr>
+                    <td>d<SUB>0</SUB></td>
+                    <td>
+                    <input type="number" min="0" step= "any" id="d0" name="d0" value="2.75">nm</td>
+                </tr>
+                <tr>
+                    <td>l</td>
+                    <td> <input type="number" min="0" step= "any" id="l" name="l" value="2.17">nm</td>
+                </tr>
+                <tr>
+                    <td>r<SUB>0</SUB></td>
+                    <td> <input type="number" min="0" step= "any" id="r0" name="r0" value="1">nm</td>
+                </tr>
+                <tr>
+                    <td>c<SUB>0</SUB></td>
+                    <td> <input type="number" min="-1.0" max="1.0" step= "any" id="c0" name="c0" value="0">nm<SUP>-1</SUP></td>
+                </tr>
+                <tr>
+                    <td>K<SUB>a</SUB></td>
+                    <td> <input type="number" step= "any" id="Ka" name="Ka" value="2.65E02">pN/nm</td>
+                </tr>
+                <tr>
+                    <td>K<SUB>c</SUB></td>
+                    <td> <input type="number" step= "any" id="Kc" name="Kc" value="8.50E01">pN*nm</td>
+                </tr>
+                <tr>
+                    <td>K<SUB>g</SUB></td>
+                    <td> <input type="number" step= "any" id="Kg" name="Kg" value="7.125E-02">pN*nm</td>
+                </tr>
+                <tr>
+                    <td>alpha</td>
+                    <td> <input type="number" step= "any" id="alpha" name="alpha" value="3">pN/nm</td>
+                </tr>
+                <tr>
+                    <td>s</td>
+                    <td> <input type="number" step= "any" id="s" name="s"> nm</td>
+                </tr>
+            </table>
+            <div>
+              <select id="lipidParams">
+                <option value="c18lipid">Use parameters for C<SUB>18:1</SUB> lipid</option> 
+                <option value="c22lipid">Use parameters for C<SUB>22:1</SUB> lipid</option>
+                <option value="userlipid">User-defined parameters</option>  
+              </select>
+            </div>
+
+            <div>
+              <input type="checkbox" id="r0_checkbox" name="r0_checkbox">
+              <label for="r0_checkbox"> Adjust r<SUB>0</SUB> to maintain constant volume</label>
+            </div>
+            
+            <div>
+                <input type="radio" id="sRelaxed_button" name="s_buttons" value="sRelaxed_button" checked="true">
+                <label for="sRelaxed_button">Use s<SUB>RBC</SUB></label>
+            </div>
+
+            <div>
+                <input type="radio" id="sConstrained_button" name="s_buttons" value="sConstrained_button">
+                <label for="sConstrained_button">Use s<SUB>CBC</SUB></label>
+            </div>
+
+            <div>
+                <input type="radio" id="sManual_button" name="s_buttons" value="sManual_button">
+                <label for="sManual_button">Set s value manually</label>
+            </div>
+
+            <button type="button" id="button">Calculate deltaG<SUB>deformation</SUB></button>
+            <input type="number" id="gdef_1" name="gdef" readonly>
+            <label for="gdef_1">kT</label>
+            
+            <table width="300px">
+              <tr>
+                <td>H<SUB>b</SUB></td>
+                <td> <input type="number" id="Hb" name="Hb" readonly>kT/nm<SUP>2</SUP></td>
+              </tr>
+              <tr>
+                <td>H<SUB>x</SUB></td>
+                <td> <input type="number" id="Hx" name="Hx" readonly>kT*nm<SUP>2</SUP></td>
+              </tr>
+              <tr>
+                <td>H<SUB>c</SUB></td>
+                <td> <input type="number" id="Hc" name="Hc" readonly>kT</td>
+              </tr>
+              <tr>
+                <th colspan="2">Parameters for graph range and step</th>
+              </tr>
+              <tr>
+                <td>r<SUB>stop</SUB></td>
+                <td>
+                <input type="number" step= "any" id="rstop" name="rstop" value="7.0">nm</td>
+              </tr>
+              <tr>
+                <td>step</SUB></td>
+                <td>
+                <input type="number" min="0" step= "any" id="rstep" name="rstep" value="0.05">nm</td>   
+              </tr>            
+            </table>
+            <A HREF="biquadratic.html">Biquadratic function</A> 
+        </form>
+        </div>
+        <div class="col-md-auto">
+          <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="pert-tab" data-bs-toggle="tab" data-bs-target="#pert" type="button" role="tab" aria-controls="pert" aria-selected="true">Perturbation</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="pertcoords-tab" data-bs-toggle="tab" data-bs-target="#pertcoords" type="button" role="tab" aria-controls="pertcoords" aria-selected="false">Perturbation Coordinates</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="energy-tab" data-bs-toggle="tab" data-bs-target="#energy" type="button" role="tab" aria-controls="energy" aria-selected="false">Energy</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="energycoords-tab" data-bs-toggle="tab" data-bs-target="#energycoords" type="button" role="tab" aria-controls="energycoords" aria-selected="false">Energy Coordinates</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="curvaturecoords-tab" data-bs-toggle="tab" data-bs-target="#curvaturecoords" type="button" role="tab" aria-controls="curvaturecoords" aria-selected="false">Curvature Coordinates</button>
+            </li>
+          </ul>
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="pert" role="tabpanel" aria-labelledby="pert-tab">
+              <p>Perturbation plot</p>
+              <div>
+                <canvas id="pertChart"></canvas>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>             
+              </div>                        
+            </div>
+            <div class="tab-pane fade" id="pertcoords" role="tabpanel" aria-labelledby="pertcoords-tab">
+              <p>Perturbation coordinates</p>
+              <div style="width:200px; height:400px; overflow:auto;">
+                <table id="pertCoordTable">
+                  <tr>
+                    <th>r</th>
+                    <th>u</th>
+                  </tr>
+                </table>
+              </div>
+              <A HREF="javascript:void(0);" class="button" id="pertCoordDL">Download perturbation coordinates data </A>
+            </div>
+            <div class="tab-pane fade" id="energy" role="tabpanel" aria-labelledby="energy-tab">
+              <p>Energy</p> 
+              <div>
+                <canvas id="energyChart"></canvas>         
+              </div>    
+            </div>
+            <div class="tab-pane fade" id="energycoords" role="tabpanel" aria-labelledby="energycoords-tab">
+              <p>Energy coordinates</p>
+              <div style="width:400px; height:400px; overflow:auto;">
+                <table id="energyCoordTable">
+                  <tr>
+                    <th>r</th>
+                    <th>G<SUB>CE</SUB></th>
+                    <th>G<SUB>SD</SUB></th>
+                    <th>G<SUB>MEC</SUB></th>
+                  </tr>
+                </table>
+              </div>
+              <A HREF="javascript:void(0);" class="button" id="energyCoordDL">Download energy coordinates data </A>
+            </div>
+            <div class="tab-pane fade" id="curvaturecoords" role="tabpanel" aria-labelledby="curvaturecoords-tab">
+              <p>Curvature coordinates</p>
+              <div style="width:400px; height:400px; overflow:auto;">
+                <table id="curvatureTable">
+                  <tr>
+                    <th>r</th>
+                    <th>c<SUB>1</SUB>+c<SUB>2</SUB></th>
+                  </tr>
+                </table>
+              </div>
+              <A HREF="javascript:void(0);" class="button" id="curvatureCoordDL">Download curvature coordinates data </A>
+            </div>  
+            </div>           
+          </div>
+      </div>
+    </div>     
+  </body>
+</html>
+
+<script>
+  //update parameters depending on drop-down selection
+  document.getElementById('lipidParams').addEventListener('change', function() {
+    if(document.getElementById('lipidParams').value == 'c18lipid'){
+      document.getElementById('d0').value=2.75;
+      document.getElementById('Ka').value=2.65E02;
+      document.getElementById('Kc').value=8.50E01;    
+    }
+    else if(document.getElementById('lipidParams').value == 'c22lipid'){
+      document.getElementById('d0').value=3.63;
+      document.getElementById('Ka').value=2.63E02;
+      document.getElementById('Kc').value=1.20E02; 
+    }
+  });
+  //update everything when gdef calculation button is pressed
+  document.getElementById('button').addEventListener('click', function() {
+    document.getElementById('gdef_1').value=curvature_Analytical()[7].re.toExponential(7);
+    document.getElementById('Hb').value=curvature_Analytical()[3].re.toExponential(6);
+    document.getElementById('Hx').value=curvature_Analytical()[4].re.toExponential(6);
+    document.getElementById('Hc').value=curvature_Analytical()[5].re.toExponential(6);
+    // we move these to local storage so we can use them for the biquadratic function
+    localStorage.setItem('Hb',document.getElementById('Hb').value);
+    localStorage.setItem('Hx',document.getElementById('Hx').value);
+    localStorage.setItem('Hc',document.getElementById('Hc').value);
+    // change s
+    if(document.getElementById("sRelaxed_button").checked){
+        document.getElementById("s").value=curvature_Analytical()[6].re.toExponential(6);
+    }
+    else if(document.getElementById("sConstrained_button").checked){
+        document.getElementById("s").value=0;
+    }
+    //update plots and coordinates tables
+    // first delete any existing plots and data
+    let pertChartStatus = Chart.getChart("pertChart"); // <canvas> id
+    if (pertChartStatus != undefined) {
+        pertChartStatus.destroy();
+    }
+    let energyChartStatus = Chart.getChart("energyChart"); // <canvas> id
+    if (energyChartStatus != undefined) {
+        energyChartStatus.destroy();
+    }
+    var pertCoordsTableLength=document.getElementById("pertCoordTable").rows.length;
+    var energyCoordsTableLength=document.getElementById("energyCoordTable").rows.length;
+    if(Number(pertCoordsTableLength) > 1){
+        while(Number(document.getElementById("pertCoordTable").rows.length)>1){
+            document.getElementById("pertCoordTable").deleteRow(1);
+        }
+    }
+    if(Number(energyCoordsTableLength) > 1){
+        while(Number(document.getElementById("energyCoordTable").rows.length)>1){
+            document.getElementById("energyCoordTable").deleteRow(1);
+        }
+    }
+    //Perturbation plot
+    var r0=document.getElementById("r0").value;
+    var rStop=document.getElementById("rstop").value;
+    var rStep=document.getElementById("rstep").value;
+    var uForRange=getUforRange(r0,rStop,rStep);
+    var pcht = document.getElementById("pertChart");
+    var pertChart=new Chart(pcht,{
+      type: 'scatter',
+      data: {
+      datasets: [{
+        label: 'Perturbation Plot',
+        data: formatPertPlotData(uForRange),
+        showLine: true,
+        fill: false,
+        backgroundColor: 'rgb(255, 99, 132)'
+      }]
+    }
+    }); 
+    // Perturbation coordinates
+    var pertCoordData = getUforRange(document.getElementById("r0").value,document.getElementById("rstop").value,document.getElementById("rstep").value);
+    fillPertCoordData(pertCoordData)
+
+    downloadBlob(arrayToCSV(pertCoordData),"pertCoordDL",'pertcoords.csv','text/csv;charset=utf-8;')
+    // Energy plot
+    var energyForRange=getEnergyDecompforRange(r0,rStop,rStep);
+    var echt = document.getElementById("energyChart");
+    var energyChart=new Chart(echt,{
+    type: 'scatter',
+    data: {
+    datasets: [{
+        label: 'deltaGce',
+        data: formatEnergyPlotData(energyForRange[0],energyForRange[1]),
+        showLine: true,
+        fill: false,
+        backgroundColor: 'rgb(255, 0, 0)',
+    },
+    {
+        label: 'deltaGsd',
+        data: formatEnergyPlotData(energyForRange[0],energyForRange[2]),
+        showLine: true,
+        fill: false,
+        backgroundColor: 'rgb(0, 0, 255)',
+    },
+    {
+        label: 'deltaGmec',
+        data: formatEnergyPlotData(energyForRange[0],energyForRange[3]),
+        showLine: true,
+        fill: false,
+        backgroundColor: 'rgb(0, 255, 0)',
+    },                    
+    ]
+    }
+    });
+    // Energy coordinates
+    fillEnergyCoordData(energyForRange);
+    
+    downloadBlob(arrayToCSV(energyForRange),"energyCoordDL",'energycoords.csv','text/csv;charset=utf-8;');
+    // Curvature coordinates
+    var curvatureCoordData = getCurvatureforRange(document.getElementById("r0").value,document.getElementById("rstop").value,document.getElementById("rstep").value);
+    fillCurvatureCoordData(curvatureCoordData)
+    downloadBlob(arrayToCSV(curvatureCoordData),"curvatureCoordDL",'curvaturecoords.csv','text/csv;charset=utf-8;');
+  });
+
+
+</script>

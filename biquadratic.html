@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="Biquadratic equation of u0 and c0 for calculating energetics of membrane inclusion-induced bilayer deformations">
+    <meta name="author" content="Shirley Pu"
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    
+    <!-- Plotly used for plots -->
+    <script src="https://cdn.plot.ly/plotly-2.16.1.min.js"></script>
+
+    <!-- Scripts used for functions. Sourced after all parameters are loaded -->
+    <script src="functions.js"></script>
+
+    <!-- Javascript library used for math -->
+    <script src="math.js"></script>
+    
+      <title>Gdef as biquadratic function of u0 and c0</title>
+  </head>
+  <body>
+    <h1>Biquadratic function of u<SUB>0</SUB> and c<SUB>0</SUB> for energetics of Inclusion-Induced Bilayer Deformations</h1>
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-auto">
+          <form id="biquadraticfrm">
+            <table width="300px" border="1px">
+                <tr>
+                    <th colspan="2">Parameters</th>
+                </tr>
+                <tr>
+                    <td>u<SUB>0</SUB>_min</td>
+                    <td>
+                    <input type="number" step= "any" id="u0_min" name="u0_min" value="-0.3">nm</td>
+                </tr>
+                <tr>
+                    <td>u<SUB>0</SUB>_max</td>
+                    <td>
+                    <input type="number" step= "any" id="u0_max" name="u0_max" value="0.3">nm</td>
+                </tr>
+                <tr>
+                    <td>u<SUB>0</SUB>_step</td>
+                    <td>
+                    <input type="number" step= "any" id="u0_step" name="u0_step" value="0.01">nm</td>
+                </tr>
+                <tr>
+                    <td>c<SUB>0</SUB>_step</td>
+                    <td>
+                    <input type="number" step= "any" id="c0_step" name="c0_step" value="0.01">nm</td>
+                </tr>
+                <tr>
+                    <td>c<SUB>0</SUB>_min</td>
+                    <td>
+                    <input type="number" min="-1" max="1" step= "any" id="c0_min" name="c0_min" value="-0.3">nm</td>
+                </tr>
+                <tr>
+                    <td>c<SUB>0</SUB>_max</td>
+                    <td>
+                    <input type="number" min="-1" max="1" step= "any" id="c0_max" name="c0_max" value="0.3">nm</td>
+                </tr>
+                <tr>
+                    <td>H<SUB>b</SUB></td>
+                    <td> <input type="number" step= "any" id="Hb_bq" name="Hb_bq">nm</td>
+                </tr>
+                <tr>
+                    <td>H<SUB>x</SUB></td>
+                    <td> <input type="number" step= "any" id="Hx_bq" name="Hx_bq">nm</td>
+                </tr>
+                <tr>
+                    <td>H<SUB>c</SUB></td>
+                    <td> <input type="number" step= "any" id="Hc_bq" name="Hc_bq">nm</td>
+                </tr>
+                </table>
+            <button type="button" id="button_bq">Calculate deltaG<SUB>deformation</SUB></button>
+            
+            <script>
+              // get Hb, Hx, Hc from local storage (output from the main application page)
+              document.getElementById('Hb_bq').value=Number(localStorage.getItem('Hb')); 
+              document.getElementById('Hx_bq').value=Number(localStorage.getItem('Hx'));
+              document.getElementById('Hc_bq').value=Number(localStorage.getItem('Hc'));
+
+            </script>
+          </form>
+        </div>
+
+        <div class="col-md-auto">
+            <ul class="nav nav-tabs" id="myTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="bq-plot-tab" data-bs-toggle="tab" data-bs-target="#bq-plot" type="button" role="tab" aria-controls="bq-plot" aria-selected="true">Biquadratic plot</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="bq-coords-tab" data-bs-toggle="tab" data-bs-target="#bq-coords" type="button" role="tab" aria-controls="bq-coords" aria-selected="false">Biquadratic Coordinates</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="q-plot-tab" data-bs-toggle="tab" data-bs-target="#q-plot" type="button" role="tab" aria-controls="q-plot" aria-selected="false">Quadratic plots</button>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="q-coords-tab" data-bs-toggle="tab" data-bs-target="#q-coords" type="button" role="tab" aria-controls="q-coords" aria-selected="false">Quadratic Coordinates</button>
+              </li>              
+            </ul>
+            <div class="tab-content" id="myTabContent">
+              <div class="tab-pane fade show active" id="bq-plot" role="tabpanel" aria-labelledby="bq-plot-tab">
+                <p>Biquadratic plot</p>
+                <div>
+                  <div id="biquadraticplot"></div>
+                </div>                        
+              </div>
+              <div class="tab-pane fade" id="bq-coords" role="tabpanel" aria-labelledby="bq-coords-tab">
+                <p>Biquadratic coordinates</p>
+                <div style="width:200px; height:400px; overflow:auto;">
+                  <table id="bqCoordTable">
+                    <tr>
+                      <th>u0</th>
+                      <th>c0</th>
+                      <th>Gdef</th>
+                    </tr>
+                  </table>
+                </div>
+                <A HREF="javascript:void(0);" class="button" id="biquadraticCoordDL">Download biquadratic coordinates data </A>
+              </div>
+              <div class="tab-pane fade" id="q-plot" role="tabpanel" aria-labelledby="q-plot-tab">
+                <p>Quadratic plots</p>
+                <div>
+                  <div id="quadraticu0plot"></div>
+                </div>
+                <div>
+                  <div id="quadraticc0plot"></div>
+                </div>    
+              </div>
+              <div class="tab-pane fade" id="q-coords" role="tabpanel" aria-labelledby="q-coords-tab">
+                <p>Quadratic plot coordinates</p>
+                <div style="width:200px; height:400px; overflow:auto;">
+                  <table id="u0CoordTable">
+                    <tr>
+                      <th>u0</th>
+                      <th>Gdef</th>
+                    </tr>
+                  </table>
+                </div>
+                <A HREF="javascript:void(0);" class="button" id="u0CoordDL">Download u0 quadratic coordinates data </A>
+                <div style="width:200px; height:400px; overflow:auto;">
+                  <table id="c0CoordTable">
+                    <tr>
+                      <th>c0</th>
+                      <th>Gdef</th>
+                    </tr>
+                  </table>
+                </div>
+                <A HREF="javascript:void(0);" class="button" id="c0CoordDL">Download c0 quadratic coordinates data </A>  
+              </div>             
+          </div>
+          <script>
+              // biquadratic function
+              function bqFunction(u,c,Hb,Hx,Hc){
+              var Gdef = (Hb*(u*u))+(Hx*u*c)+(Hc*(c*c));
+              return(Gdef);
+              };
+
+              function quadraticEq(u0,c0,Hb,Hx,Hc){
+              // the variable which is to be solved for should be input as 0
+                if(u0==0){
+                  u0_p=((-1*Hx*c0)+sqrt((Hx*c0*Hx*c0)-(4*Hb*Hc*c0*c0)))/(2*Hb);
+                  u0_n=((-1*Hx*c0)-sqrt((Hx*c0*Hx*c0)-(4*Hb*Hc*c0*c0)))/(2*Hb);
+                  return([u0_p,u0_n])
+                }
+                if(c0==0){
+                  c0_p=((-1*Hx*u0)+sqrt((Hx*u0*Hx*u0)-(4*Hc*Hx*u0*u0)))/(2*Hc);
+                  c0_n=((-1*Hx*u0)-sqrt((Hx*u0*Hx*u0)-(4*Hc*Hx*u0*u0)))/(2*Hc);
+                  return([c0_p,c0_n])
+                }    
+              };
+          
+              //function for getting arrays from min to max provided u0 and c0
+              function getBQCoords(u0Vals,u0Step,c0Vals,c0Step,Hb,Hx,Hc){
+              var u0_min=u0Vals[0];
+              var u0_max=u0Vals[1];
+              var u0_length=(u0_max-u0_min)/u0Step;
+              var c0_min=c0Vals[0];
+              var c0_max=c0Vals[1];                    
+              var c0_length=(c0_max-c0_min)/c0Step;
+
+              var u0Array=Array(u0_length).fill().map((u0,i) => Number(u0_min) + (i*u0Step));
+              var c0Array=Array(c0_length).fill().map((c0,j) => Number(c0_min) + (j*c0Step));                    
+              // format as array of arrays for plot
+              var u0ArrayPlot=[];
+              var c0ArrayPlot=[];
+              var gdefArray=[];
+          
+              for(let i=0;i<u0_length;i++){
+                  var currU0=u0Array[i];
+                  u0ArrayPlot.push(Array(c0Array.length).fill(currU0));
+                  c0ArrayPlot.push(c0Array);
+                  gdefArray.push(c0Array.map((c0) => bqFunction(currU0,c0,Hb,Hx,Hc)));
+              }                
+              return [u0ArrayPlot,c0ArrayPlot,gdefArray];
+              };
+
+              function getQCoords(u0Vals,u0Step,c0Vals,c0Step,Hb,Hx,Hc){
+              var u0_min=u0Vals[0];
+              var u0_max=u0Vals[1];
+              var u0_length=(u0_max-u0_min)/u0Step;
+              var c0_min=c0Vals[0];
+              var c0_max=c0Vals[1];                    
+              var c0_length=(c0_max-c0_min)/c0Step;
+
+              var u0Array=Array(u0_length).fill().map((u0,i) => Number(u0_min) + (i*u0Step));
+              var c0Array=Array(c0_length).fill().map((c0,j) => Number(c0_min) + (j*c0Step));                    
+              var u0gdefArray=u0Array.map((u0) => bqFunction(u0,0,Hb,Hx,Hc));
+              var c0gdefArray=c0Array.map((c0) => bqFunction(0,c0,Hb,Hx,Hc));
+
+              return [u0Array,u0gdefArray,c0Array,c0gdefArray];
+              };
+          
+              //update everything when gdef calculation button is pressed
+              document.getElementById('button_bq').addEventListener('click', function() {            
+              var u0Vals=[document.getElementById('u0_min').value,document.getElementById('u0_max').value];
+              var u0Step=document.getElementById('u0_step').value;
+              var c0Vals=[document.getElementById('c0_min').value,document.getElementById('c0_max').value];
+              var c0Step=document.getElementById('c0_step').value;
+              // take Hb, Hx, Hc from the main html page if they are empty. Otherwise use what is there already
+              var Hb_bq=document.getElementById('Hb_bq').value;
+              var Hx_bq=document.getElementById('Hx_bq').value;
+              var Hc_bq=document.getElementById('Hc_bq').value;                    
+
+              //update plot
+              var plotData=getBQCoords(u0Vals,u0Step,c0Vals,c0Step,Hb_bq,Hx_bq,Hc_bq);
+              var data = [{
+                      x: plotData[0],
+                      y: plotData[1],
+                      z: plotData[2],
+                      type: 'surface'
+                  }];
+                          
+              var layout = {
+              title: {text: 'G<SUB>def</SUB> as biquadratic function of u<SUB>0</SUB> and c<SUB>0</SUB>'},
+              scene:{
+                xaxis:{
+                  title: {
+                    text: 'u0'
+                  },
+              },
+              yaxis:{
+                  title: {
+                    text: 'c0'
+                  },
+              },
+              zaxis:{
+                  title:{
+                    text: 'Gdef',
+                    ticksuffix: 'kT'
+                  },
+              },
+              },
+              autosize: false,
+              width: 800,
+              height: 800,
+              margin: {
+                  l: 65,
+                  r: 50,
+                  b: 65,
+                  t: 90,
+              }                   
+              };
+          
+              Plotly.newPlot('biquadraticplot',data,layout);     
+              
+              fillBiquadraticCoordData(plotData);
+              downloadBlob(arrayToCSV(plotData),"biquadraticCoordDL",'biquadraticcoords.csv','text/csv;charset=utf-8;'); 
+
+              // quadratic plots as function of single variable (u0 or c0)
+              var qplotData=getQCoords(u0Vals,u0Step,c0Vals,c0Step,Hb_bq,Hx_bq,Hc_bq);
+              // Gdef vs u0 plot
+              var u0data = [{
+                      x: qplotData[0],
+                      y: qplotData[1],
+                      mode: 'lines+markers'
+                  }];
+                          
+              var u0layout = {
+              title: {text: 'G<SUB>def</SUB> as quadratic function of u<SUB>0</SUB> when c<SUB>0</SUB>=0'},
+              scene:{
+                xaxis:{
+                  title: {
+                    text: 'u0'
+                  },
+              },
+              yaxis:{
+                  title: {
+                    text: 'Gdef'
+                  },
+              },
+              },
+              autosize: false,
+              width: 400,
+              height: 400,
+              margin: {
+                  l: 65,
+                  r: 50,
+                  b: 65,
+                  t: 90,
+              }                   
+              };
+          
+              Plotly.newPlot('quadraticu0plot',u0data,u0layout);
+              // Gdef vs c0 plot
+              var c0data = [{
+                      x: qplotData[2],
+                      y: qplotData[3],
+                      mode: 'lines+markers'
+                  }];
+                          
+              var c0layout = {
+              title: {text: 'G<SUB>def</SUB> as quadratic function of c<SUB>0</SUB> when u<SUB>0</SUB>=0'},
+              scene:{
+                xaxis:{
+                  title: {
+                    text: 'c0'
+                  },
+              },
+              yaxis:{
+                  title: {
+                    text: 'Gdef'
+                  },
+              },
+              },
+              autosize: false,
+              width: 400,
+              height: 400,
+              margin: {
+                  l: 65,
+                  r: 50,
+                  b: 65,
+                  t: 90,
+              }                   
+              };
+          
+              Plotly.newPlot('quadraticc0plot',c0data,c0layout);
+
+              // we are using the fillPertCoordData function to fill in the coordinates tables for the quadratic plots
+              fillQuadraticCoordData([qplotData[0],qplotData[1]],"u0CoordTable");
+              downloadBlob(arrayToCSV([qplotData[0],qplotData[1]]),"u0CoordDL",'u0quadraticcoords.csv','text/csv;charset=utf-8;'); 
+
+              fillQuadraticCoordData([qplotData[2],qplotData[3]],"c0CoordTable");
+              downloadBlob(arrayToCSV([qplotData[2],qplotData[3]]),"c0CoordDL",'c0quadraticcoords.csv','text/csv;charset=utf-8;'); 
+              });                            
+          </script>
+
+
+
+
+
+
+
