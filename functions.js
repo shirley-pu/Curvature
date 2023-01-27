@@ -28,7 +28,6 @@ function calcSmin(){
     var ka=document.getElementById("Ka").value;
     ka = 4*ka;
     var kc=document.getElementById("Kc").value;
-    var kg=document.getElementById("Kg").value;
     var s=document.getElementById("s").value;
     var c0=document.getElementById("c0").value;
 
@@ -87,7 +86,6 @@ function calcU(r){
     var r0=document.getElementById("r0").value;
     var ka=document.getElementById("Ka").value;
     var kc=document.getElementById("Kc").value;
-    var kg=document.getElementById("Kg").value;
     var alpha=document.getElementById("alpha").value;
     var s=document.getElementById("s").value;
     if(document.getElementById("sRelaxed_button").checked){
@@ -138,7 +136,6 @@ function calcdU(r){
         }
     var ka=document.getElementById("Ka").value;
     var kc=document.getElementById("Kc").value;
-    var kg=document.getElementById("Kg").value;
     var alpha=document.getElementById("alpha").value;
     var s=document.getElementById("s").value;
     if(document.getElementById("sRelaxed_button").checked){
@@ -235,7 +232,6 @@ function getDeltaGsd(r){
         }
     var ka=document.getElementById("Ka").value;
     var kc=document.getElementById("Kc").value;
-    var kg=document.getElementById("Kg").value;
     var alpha=document.getElementById("alpha").value;
     var s=document.getElementById("s").value;
     if(document.getElementById("sRelaxed_button").checked){
@@ -288,7 +284,6 @@ function getDeltaGmec(r){
         }
     var ka=document.getElementById("Ka").value;
     var kc=document.getElementById("Kc").value;
-    var kg=document.getElementById("Kg").value;
     var alpha=document.getElementById("alpha").value;
     var s=document.getElementById("s").value;
     if(document.getElementById("sRelaxed_button").checked){
@@ -384,7 +379,6 @@ function getCurvature(r){
         }
     var ka=document.getElementById("Ka").value;
     var kc=document.getElementById("Kc").value;
-    var kg=document.getElementById("Kg").value;
     var alpha=document.getElementById("alpha").value;
     var s=document.getElementById("s").value;
     if(document.getElementById("sRelaxed_button").checked){
@@ -467,7 +461,6 @@ if(document.getElementById("r0_checkbox").checked){
     }
 var ka=document.getElementById("Ka").value;
 var kc=document.getElementById("Kc").value;
-var kg=document.getElementById("Kg").value;
 var alpha=document.getElementById("alpha").value;
 var s=document.getElementById("s").value;
 if(document.getElementById("sRelaxed_button").checked){
@@ -516,7 +509,6 @@ var r0=document.getElementById("r0").value;
 var ka=document.getElementById("Ka").value;
 ka = 4*ka;
 var kc=document.getElementById("Kc").value;
-var kg=document.getElementById("Kg").value;
 var s=document.getElementById("s").value;
 if(document.getElementById("sRelaxed_button").checked){
     s=calcSmin();
@@ -593,7 +585,6 @@ var ka=265;
 ka = 4*ka;
 //var kc=document.getElementById("Kc").value;
 var kc=85;
-var kg=document.getElementById("Kg").value;
 //var alpha=document.getElementById("alpha").value;
 var s=document.getElementById("s").value;
 var c0=document.getElementById("c0").value;
