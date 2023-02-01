@@ -69,15 +69,15 @@
                 </tr>
                 <tr>
                     <td>H<SUB>b</SUB></td>
-                    <td> <input type="number" step= "any" id="Hb_bq" name="Hb_bq">nm</td>
+                    <td> <input type="number" step= "any" id="Hb_bq" name="Hb_bq"></td>
                 </tr>
                 <tr>
                     <td>H<SUB>x</SUB></td>
-                    <td> <input type="number" step= "any" id="Hx_bq" name="Hx_bq">nm</td>
+                    <td> <input type="number" step= "any" id="Hx_bq" name="Hx_bq"></td>
                 </tr>
                 <tr>
                     <td>H<SUB>c</SUB></td>
-                    <td> <input type="number" step= "any" id="Hc_bq" name="Hc_bq">nm</td>
+                    <td> <input type="number" step= "any" id="Hc_bq" name="Hc_bq"></td>
                 </tr>
                 </table>
             <button type="button" id="button_bq">Calculate deltaG<SUB>deformation</SUB></button>
@@ -184,10 +184,10 @@
               function getBQCoords(u0Vals,u0Step,c0Vals,c0Step,Hb,Hx,Hc){
               var u0_min=u0Vals[0];
               var u0_max=u0Vals[1];
-              var u0_length=Math.round((u0_max-u0_min)/u0Step);
+              var u0_length=Math.round((u0_max-u0_min)/u0Step)+1;
               var c0_min=c0Vals[0];
               var c0_max=c0Vals[1];                    
-              var c0_length=Math.round((c0_max-c0_min)/c0Step);
+              var c0_length=Math.round((c0_max-c0_min)/c0Step)+1;
 
               var u0Array=Array(u0_length).fill().map((u0,i) => Number(u0_min) + (i*u0Step));
               var c0Array=Array(c0_length).fill().map((c0,j) => Number(c0_min) + (j*c0Step));                    
@@ -208,10 +208,10 @@
               function getQCoords(u0Vals,u0Step,c0Vals,c0Step,Hb,Hx,Hc){
               var u0_min=u0Vals[0];
               var u0_max=u0Vals[1];
-              var u0_length=Math.round((u0_max-u0_min)/u0Step);
+              var u0_length=Math.round((u0_max-u0_min)/u0Step)+1;
               var c0_min=c0Vals[0];
               var c0_max=c0Vals[1];                    
-              var c0_length=Math.round((c0_max-c0_min)/c0Step);
+              var c0_length=Math.round((c0_max-c0_min)/c0Step)+1;
 
               var u0Array=Array(u0_length).fill().map((u0,i) => Number(u0_min) + (i*u0Step));
               var c0Array=Array(c0_length).fill().map((c0,j) => Number(c0_min) + (j*c0Step));                    
