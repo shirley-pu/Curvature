@@ -4,7 +4,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="Biquadratic equation of u0 and c0 for calculating energetics of membrane inclusion-induced bilayer deformations">
+    <meta name="Gdef as biquadratic function of u0 and c0">
     <meta name="author" content="Shirley Pu"
 
     <!-- Bootstrap CSS -->
@@ -22,7 +22,7 @@
       <title>Gdef as biquadratic function of u0 and c0</title>
   </head>
   <body>
-    <h1>Biquadratic function of u<SUB>0</SUB> and c<SUB>0</SUB> for energetics of Inclusion-Induced Bilayer Deformations</h1>
+    <h1>&#916G<SUB>def</SUB>, relaxed boundary condition, as a biquadratic function of u<SUB>0</SUB> and c<SUB>0</SUB></h1>
 
     <!-- Optional JavaScript; choose one of the two! -->
 
@@ -80,7 +80,7 @@
                     <td> <input type="number" step= "any" id="Hc_bq" name="Hc_bq"></td>
                 </tr>
                 </table>
-            <button type="button" id="button_bq">Calculate deltaG<SUB>deformation</SUB></button>
+            <button type="button" id="button_bq">Calculate &#916G<SUB>deformation</SUB></button>
             
             <p> This page is slow so be patient (it may take a few minutes to load) </p>
             
@@ -120,9 +120,9 @@
                 <div style="width:200px; height:400px; overflow:auto;">
                   <table id="bqCoordTable">
                     <tr>
-                      <th>u0</th>
-                      <th>c0</th>
-                      <th>Gdef</th>
+                      <th>u<SUB>0</SUB></th>
+                      <th>c<SUB>0</SUB></th>
+                      <th>&#916G<SUB>def</SUB></th>
                     </tr>
                   </table>
                 </div>
@@ -142,8 +142,8 @@
                 <div style="width:200px; height:400px; overflow:auto;">
                   <table id="u0CoordTable">
                     <tr>
-                      <th>u0</th>
-                      <th>Gdef</th>
+                      <th>u<SUB>0</SUB></th>
+                      <th>&#916G<SUB>def</SUB></th>
                     </tr>
                   </table>
                 </div>
@@ -151,8 +151,8 @@
                 <div style="width:200px; height:400px; overflow:auto;">
                   <table id="c0CoordTable">
                     <tr>
-                      <th>c0</th>
-                      <th>Gdef</th>
+                      <th>c<SUB>0<SUB></th>
+                      <th>&#916G<SUB>def</SUB></th>
                     </tr>
                   </table>
                 </div>
@@ -242,7 +242,7 @@
                   }];
                           
               var layout = {
-              title: {text: 'G<SUB>def</SUB> as biquadratic function of u<SUB>0</SUB> and c<SUB>0</SUB>'},
+              title: {text: '&#916G<SUB>def</SUB> as biquadratic function of u<SUB>0</SUB> and c<SUB>0</SUB>'},
               scene:{
                 xaxis:{
                   title: {
@@ -287,7 +287,7 @@
                   }];
                           
               var u0layout = {
-              title: {text: 'G<SUB>def</SUB> as quadratic function of u<SUB>0</SUB> when c<SUB>0</SUB>=0'},
+              title: {text: '&#916G<SUB>def</SUB> as quadratic function of u<SUB>0</SUB> when c<SUB>0</SUB>=0'},
               scene:{
                 xaxis:{
                   title: {
@@ -320,7 +320,7 @@
                   }];
                           
               var c0layout = {
-              title: {text: 'G<SUB>def</SUB> as quadratic function of c<SUB>0</SUB> when u<SUB>0</SUB>=0'},
+              title: {text: '&#916G<SUB>def</SUB> as quadratic function of c<SUB>0</SUB> when u<SUB>0</SUB>=0'},
               scene:{
                 xaxis:{
                   title: {
