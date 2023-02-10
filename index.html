@@ -360,7 +360,7 @@
     }); 
     // Perturbation coordinates
     var pertCoordData = getUforRange(document.getElementById("r0").value,document.getElementById("rstop").value,document.getElementById("rstep").value);
-    fillPertCoordData(pertCoordData)
+    fillPertCoordDataFast(pertCoordData)
 
     downloadBlob(arrayToCSV(pertCoordData),"pertCoordDL",'pertcoords.csv','text/csv;charset=utf-8;')
     // Energy plot
@@ -410,12 +410,12 @@
       }
     });
     // Energy coordinates
-    fillEnergyCoordData(energyForRange);
+    fillEnergyCoordDataFast(energyForRange);
     
     downloadBlob(arrayToCSV(energyForRange),"energyCoordDL",'energycoords.csv','text/csv;charset=utf-8;');
     // Curvature coordinates
     var curvatureCoordData = getCurvatureforRange(document.getElementById("r0").value,document.getElementById("rstop").value,document.getElementById("rstep").value);
-    fillCurvatureCoordData(curvatureCoordData)
+    fillCurvatureCoordDataFast(curvatureCoordData)
     downloadBlob(arrayToCSV(curvatureCoordData),"curvatureCoordDL",'curvaturecoords.csv','text/csv;charset=utf-8;');
   });
 

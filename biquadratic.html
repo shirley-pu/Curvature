@@ -274,7 +274,7 @@
           
               Plotly.newPlot('biquadraticplot',data,layout);     
               
-              fillBiquadraticCoordData(plotData);
+              fillBiquadraticCoordDataFast(plotData);
               downloadBlob(arrayToCSV(plotData),"biquadraticCoordDL",'biquadraticcoords.csv','text/csv;charset=utf-8;'); 
 
               // quadratic plots as function of single variable (u0 or c0)
@@ -347,10 +347,10 @@
               Plotly.newPlot('quadraticc0plot',c0data,c0layout);
 
               // we are using the fillPertCoordData function to fill in the coordinates tables for the quadratic plots
-              fillQuadraticCoordData([qplotData[0],qplotData[1]],"u0CoordTable");
+              fillQuadraticCoordDataFast([qplotData[0],qplotData[1]],"u0CoordTable");
               downloadBlob(arrayToCSV([qplotData[0],qplotData[1]]),"u0CoordDL",'u0quadraticcoords.csv','text/csv;charset=utf-8;'); 
 
-              fillQuadraticCoordData([qplotData[2],qplotData[3]],"c0CoordTable");
+              fillQuadraticCoordDataFast([qplotData[2],qplotData[3]],"c0CoordTable");
               downloadBlob(arrayToCSV([qplotData[2],qplotData[3]]),"c0CoordDL",'c0quadraticcoords.csv','text/csv;charset=utf-8;'); 
               });                            
           </script>

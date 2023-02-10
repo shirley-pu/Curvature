@@ -200,14 +200,28 @@ function getUforRange(startR,stopR,interval){
 
 function formatPertPlotData(getURangeOutput){
     var d0=document.getElementById("d0").value;
+    var monolayerWidth=Number(d0)/2;
     let plotData = getURangeOutput;
-    let coords = plotData[0].map( (r,i) => ({x: r, y: Number(Number(d0) - plotData[1][i])}));
+    let coords = plotData[0].map( (r,i) => ({x: r, y: Number(Number(monolayerWidth) - plotData[1][i])}));
     return(coords)
 }
 
 function fillPertCoordData(getURangeOutput){
     for(var i=0; i < getURangeOutput[0].length; i++){
         document.getElementById("pertCoordTable").innerHTML+="<tr><td>"+Number(getURangeOutput[0][i]).toPrecision(3)+"</td><td>"+Number(getURangeOutput[1][i]).toPrecision(5)+"</td></tr>"
+    }
+}
+
+function fillPertCoordDataFast(getURangeOutput){
+    var pertCoords;
+    for(var i=0; i < getURangeOutput[0].length; i++){
+        if(pertCoords == undefined){
+            pertCoords="<tr><td>"+Number(getURangeOutput[0][i]).toPrecision(3)+"</td><td>"+Number(getURangeOutput[1][i]).toPrecision(5)+"</td></tr>"
+        }
+        else{
+            pertCoords+="<tr><td>"+Number(getURangeOutput[0][i]).toPrecision(3)+"</td><td>"+Number(getURangeOutput[1][i]).toPrecision(5)+"</td></tr>"
+        }
+        document.getElementById("pertCoordTable").innerHTML+=pertCoords;
     }
 }
 
@@ -226,10 +240,6 @@ function getDeltaGsd(r){
     var d0=document.getElementById("d0").value;
     var l=document.getElementById("l").value;
     var r0=document.getElementById("r0").value;
-    if(document.getElementById("r0_checkbox").checked){
-            //update for the case of l1 -> l2
-            r0=r0;
-        }
     var ka=document.getElementById("Ka").value;
     var kc=document.getElementById("Kc").value;
     var alpha=document.getElementById("alpha").value;
@@ -278,10 +288,6 @@ function getDeltaGmec(r){
     var d0=document.getElementById("d0").value;
     var l=document.getElementById("l").value;
     var r0=document.getElementById("r0").value;
-    if(document.getElementById("r0_checkbox").checked){
-            //update for the case of l1 -> l2
-            r0=r0;
-        }
     var ka=document.getElementById("Ka").value;
     var kc=document.getElementById("Kc").value;
     var alpha=document.getElementById("alpha").value;
@@ -366,6 +372,19 @@ function fillEnergyCoordData(getEnergyDecompOutput){
     }
 }
 
+function fillEnergyCoordDataFast(getEnergyDecompOutput){
+    var energyCoords;
+    for(var i=0; i < getEnergyDecompOutput[0].length; i++){
+        if(energyCoords == undefined){
+            energyCoords="<tr><td>"+Number(getEnergyDecompOutput[0][i]).toPrecision(3)+"</td><td>"+Number(getEnergyDecompOutput[1][i]).toPrecision(5)+"</td><td>"+Number(getEnergyDecompOutput[2][i]).toPrecision(5)+"</td><td>"+Number(getEnergyDecompOutput[3][i]).toPrecision(5)+"</td></tr>"
+        }
+        else{
+            energyCoords+="<tr><td>"+Number(getEnergyDecompOutput[0][i]).toPrecision(3)+"</td><td>"+Number(getEnergyDecompOutput[1][i]).toPrecision(5)+"</td><td>"+Number(getEnergyDecompOutput[2][i]).toPrecision(5)+"</td><td>"+Number(getEnergyDecompOutput[3][i]).toPrecision(5)+"</td></tr>"
+        }
+    }
+    document.getElementById("energyCoordTable").innerHTML+=energyCoords;
+}
+
 function getCurvature(r){
     var changeParams=4.114;
     var imagErrorThreshold=Math.pow(10,-10)
@@ -373,10 +392,6 @@ function getCurvature(r){
     var d0=document.getElementById("d0").value;
     var l=document.getElementById("l").value;
     var r0=document.getElementById("r0").value;
-    if(document.getElementById("r0_checkbox").checked){
-            //update for the case of l1 -> l2
-            r0=r0;
-        }
     var ka=document.getElementById("Ka").value;
     var kc=document.getElementById("Kc").value;
     var alpha=document.getElementById("alpha").value;
@@ -448,6 +463,19 @@ function fillCurvatureCoordData(getCurvatureOutput){
     }
 }
 
+function fillCurvatureCoordDataFast(getCurvatureOutput){
+    var curvatureCoords;
+    for(var i=0; i < getCurvatureOutput[0].length; i++){
+        if(curvatureCoords == undefined){
+            curvatureCoords="<tr><td>"+Number(getCurvatureOutput[0][i]).toPrecision(3)+"</td><td>"+Number(getCurvatureOutput[1][i]).toPrecision(5)+"</td></tr>"           
+        }
+        else{
+            curvatureCoords+="<tr><td>"+Number(getCurvatureOutput[0][i]).toPrecision(3)+"</td><td>"+Number(getCurvatureOutput[1][i]).toPrecision(5)+"</td></tr>"
+        }
+    }
+    document.getElementById("curvatureTable").innerHTML+=curvatureCoords;
+}
+
 function getdeltaGdef_old(){
 var changeParams=4.114;
 var imagErrorThreshold=Math.pow(10,-10)
@@ -455,10 +483,6 @@ var imagErrorThreshold=Math.pow(10,-10)
 var d0=document.getElementById("d0").value;
 var l=document.getElementById("l").value;
 var r0=document.getElementById("r0").value;
-if(document.getElementById("r0_checkbox").checked){
-        //update for the case of l1 -> l2
-        r0=r0;
-    }
 var ka=document.getElementById("Ka").value;
 var kc=document.getElementById("Kc").value;
 var alpha=document.getElementById("alpha").value;
@@ -615,10 +639,39 @@ function fillBiquadraticCoordData(getBiquadraticOutput){
     }
 } 
 
+function fillBiquadraticCoordDataFast(getBiquadraticOutput){
+    var biquadraticCoords;
+    for(var i=0; i < getBiquadraticOutput[0].length; i++){
+        var currArray = getBiquadraticOutput[0][i];
+        for(var j=0; j<currArray.length;j++){
+            if(biquadraticCoords == undefined){
+                biquadraticCoords="<tr><td>"+Number(getBiquadraticOutput[0][i][j]).toPrecision(3)+"</td><td>"+Number(getBiquadraticOutput[1][i][j]).toPrecision(3)+"</td><td>"+Number(getBiquadraticOutput[2][i][j]).toPrecision(5)+"</td></tr>";
+            }
+            else{
+                biquadraticCoords+="<tr><td>"+Number(getBiquadraticOutput[0][i][j]).toPrecision(3)+"</td><td>"+Number(getBiquadraticOutput[1][i][j]).toPrecision(3)+"</td><td>"+Number(getBiquadraticOutput[2][i][j]).toPrecision(5)+"</td></tr>";
+            }
+        }
+    }
+    document.getElementById("bqCoordTable").innerHTML+=biquadraticCoords;
+}
+
 function fillQuadraticCoordData(getURangeOutput,tableName){
     for(var i=0; i < getURangeOutput[0].length; i++){
         document.getElementById(tableName).innerHTML+="<tr><td>"+Number(getURangeOutput[0][i]).toPrecision(3)+"</td><td>"+Number(getURangeOutput[1][i]).toPrecision(5)+"</td></tr>"
     }
+}
+
+function fillQuadraticCoordDataFast(getURangeOutput,tableName){
+    var quadraticCoords;
+    for(var i=0; i < getURangeOutput[0].length; i++){
+        if(quadraticCoords == undefined){
+            quadraticCoords="<tr><td>"+Number(getURangeOutput[0][i]).toPrecision(3)+"</td><td>"+Number(getURangeOutput[1][i]).toPrecision(5)+"</td></tr>"           
+        }
+        else{
+            quadraticCoords+="<tr><td>"+Number(getURangeOutput[0][i]).toPrecision(3)+"</td><td>"+Number(getURangeOutput[1][i]).toPrecision(5)+"</td></tr>"
+        }
+    }
+    document.getElementById(tableName).innerHTML+=quadraticCoords;
 }
 
 //console.log(getdeltaGdef_old());
