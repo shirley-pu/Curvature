@@ -69,21 +69,21 @@
                 </tr>
                 <tr>
                     <td>H<SUB>b</SUB></td>
-                    <td> <input type="number" step= "any" id="Hb_bq" name="Hb_bq"></td>
+                    <td> <input type="number" step= "any" id="Hb_bq" name="Hb_bq">kT/nm<SUP>2</td>
                 </tr>
                 <tr>
                     <td>H<SUB>x</SUB></td>
-                    <td> <input type="number" step= "any" id="Hx_bq" name="Hx_bq"></td>
+                    <td> <input type="number" step= "any" id="Hx_bq" name="Hx_bq">kT</td>
                 </tr>
                 <tr>
                     <td>H<SUB>c</SUB></td>
-                    <td> <input type="number" step= "any" id="Hc_bq" name="Hc_bq"></td>
+                    <td> <input type="number" step= "any" id="Hc_bq" name="Hc_bq">kT*nm<SUP>2</td>
                 </tr>
                 </table>
             <button type="button" id="button_bq">Calculate &#916G<SUB>deformation</SUB></button>
             
-            <p> This page is slow so be patient (it may take a few minutes to load) </p>
-            
+            <p> This page is slow so please be patient </p>
+            <p> Loading after pressing Calculate may take a few minutes</p>
             <script>
               // get Hb, Hx, Hc from local storage (output from the main application page)
               document.getElementById('Hb_bq').value=Number(localStorage.getItem('Hb')); 
@@ -242,7 +242,7 @@
                   }];
                           
               var layout = {
-              title: {text: '&#916G<SUB>def</SUB> as biquadratic function of u<SUB>0</SUB> and c<SUB>0</SUB>'},
+              title: {text: 'deltaG<SUB>def</SUB> as biquadratic function of u<SUB>0</SUB> and c<SUB>0</SUB>'},
               scene:{
                 xaxis:{
                   title: {
@@ -287,7 +287,7 @@
                   }];
                           
               var u0layout = {
-              title: {text: '&#916G<SUB>def</SUB> as quadratic function of u<SUB>0</SUB> when c<SUB>0</SUB>=0'},
+              title: {text: 'deltaG<SUB>def, c0=0</SUB> as quadratic function of u<SUB>0</SUB>'},
               scene:{
                 xaxis:{
                   title: {
@@ -320,7 +320,7 @@
                   }];
                           
               var c0layout = {
-              title: {text: '&#916G<SUB>def</SUB> as quadratic function of c<SUB>0</SUB> when u<SUB>0</SUB>=0'},
+              title: {text: 'deltaG<SUB>def,u0=0</SUB> as quadratic function of c<SUB>0</SUB>'},
               scene:{
                 xaxis:{
                   title: {
