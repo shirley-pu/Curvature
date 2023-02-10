@@ -54,22 +54,22 @@
                 </tr>
                 <tr>
                     <td>r<SUB>0</SUB></td>
-                    <td> <input type="number" min="0" step= "any" id="r0" name="r0" value="1">nm</td>
+                    <td> <input type="number" min="0" step= "0.01" id="r0" name="r0" value="1">nm</td>
                 </tr>
                 <tr>
                     <td>c<SUB>0</SUB></td>
-                    <td> <input type="number" min="-1.0" max="1.0" step= "any" id="c0" name="c0" value="0">nm<SUP>-1</SUP></td>
+                    <td> <input type="number" min="-1.0" max="1.0" step= "0.01" id="c0" name="c0" value="0">nm<SUP>-1</SUP></td>
                 </tr>
                 <tr>
                     <td>K<SUB>a</SUB></td>
-                    <td> <input type="number" step= "any" id="Ka" name="Ka" value="2.65E02">pN/nm</td>
+                    <td> <input type="number" step= "any" id="Ka" name="Ka" value="2.65e+2">pN/nm</td>
                 </tr>
                 <tr>
                     <td>K<SUB>c</SUB></td>
-                    <td> <input type="number" step= "any" id="Kc" name="Kc" value="8.50E01">pN*nm</td>
+                    <td> <input type="number" step= "any" id="Kc" name="Kc" value="8.50e+1">pN*nm</td>
                 </tr>
                 <tr>
-                    <td>&#945<</td>
+                    <td>&#945</td>
                     <td> <input type="number" step= "any" id="alpha" name="alpha" value="3">pN/nm</td>
                 </tr>
                 <tr>
@@ -83,11 +83,6 @@
                 <option value="c22lipid">Use parameters for C<SUB>22:1</SUB> lipid</option>
                 <option value="userlipid">User-defined parameters</option>  
               </select>
-            </div>
-
-            <div>
-              <input type="checkbox" id="r0_checkbox" name="r0_checkbox">
-              <label for="r0_checkbox"> Adjust r<SUB>0</SUB> to maintain constant volume</label>
             </div>
             
             <div>
@@ -103,6 +98,11 @@
             <div>
                 <input type="radio" id="sManual_button" name="s_buttons" value="sManual_button">
                 <label for="sManual_button">Set s value manually</label>
+            </div>
+
+            <div>
+              <input type="checkbox" id="Kratio_box" name="Kratio_box" checked>
+              <label for="Kratio_box">Maintain constant K<SUB>a</SUB>/K<SUB>c</SUB></label>
             </div>
 
             <button type="button" id="button">Calculate deltaG<SUB>deformation</SUB></button>
@@ -128,7 +128,7 @@
               <tr>
                 <td>r<SUB>stop</SUB></td>
                 <td>
-                <input type="number" step= "any" id="rstop" name="rstop" value="7.0">nm</td>
+                <input type="number" step= "any" id="rstop" name="rstop" value="10.0">nm</td>
               </tr>
               <tr>
                 <td>step</SUB></td>
@@ -217,8 +217,20 @@
 </html>
 
 <script>
+  // check that d0, l, r0 are positive
+
+  //check if c0 is within range [-1,1]
+  document.getElementById('c0').addEventListener('change', function(){
+    if(Math.abs(document.getElementById('c0').value)>1){
+    alert("Logical values for c0 should be within range [-1,1])")
+  }
+  })  
+
   //update parameters depending on drop-down selection
   document.getElementById('lipidParams').addEventListener('change', function() {
+    if(document.getElementById('Kratio_box').checked){
+      document.getElementById('Kratio_box').checked= false;
+    }
     if(document.getElementById('lipidParams').value == 'c18lipid'){
       document.getElementById('d0').value=2.75;
       document.getElementById('Ka').value=2.65E02;
@@ -230,6 +242,32 @@
       document.getElementById('Kc').value=1.20E02; 
     }
   });
+  //maintain Ka/Kc ratio if Kratio_button is checked
+  document.getElementById('Ka').onfocus = function(){
+    this.setAttribute('oldValue',this.value);
+  }
+  
+  document.getElementById('Kc').onfocus = function(){
+    this.setAttribute('oldValue',this.value);
+  }
+
+  document.getElementById('Ka').addEventListener('change', function(){    
+    if(document.getElementById('Kratio_box').checked){
+      Ka_input=document.getElementById('Ka');
+      ratio = Ka_input.value/Number(Ka_input.getAttribute('oldValue'));
+      new_Kc = document.getElementById('Kc').value*ratio;
+      document.getElementById('Kc').value= new_Kc.toExponential(2);
+    }
+  })
+  document.getElementById('Kc').addEventListener('change', function(){   
+    if(document.getElementById('Kratio_box').checked){
+      Kc_input=document.getElementById('Kc');
+      ratio = Kc_input.value/Number(Kc_input.getAttribute('oldValue'));
+      new_Ka = document.getElementById('Ka').value*ratio;
+      document.getElementById('Ka').value=new_Ka.toExponential(2);
+    }
+  })
+
   //update everything when gdef calculation button is pressed
   document.getElementById('button').addEventListener('click', function() {
     document.getElementById('gdef_1').value=curvature_Analytical()[7].re.toExponential(7);
@@ -270,6 +308,8 @@
         }
     }
     //Perturbation plot
+    var l=document.getElementById('l').value;
+    var halfInclusion=l/2;
     var r0=document.getElementById("r0").value;
     var rStop=document.getElementById("rstop").value;
     var rStep=document.getElementById("rstep").value;
@@ -279,13 +319,44 @@
       type: 'scatter',
       data: {
       datasets: [{
-        label: 'Perturbation Plot',
+        label: 'Membrane perturbation',
         data: formatPertPlotData(uForRange),
         showLine: true,
         fill: false,
         backgroundColor: 'rgb(255, 99, 132)'
-      }]
-    }
+      },
+      {
+        label: 'Inclusion',
+        data: [{
+          x: 0,
+          y: halfInclusion
+        },{
+          x: r0,
+          y: halfInclusion
+        }],
+        showLine: true,
+        fill: false,
+        backgroundColor: 'rgb(255, 0, 0)',
+        borderColor: 'rgb(255, 0, 0)'
+      }
+    ]
+    },
+    options: {
+        scales:{
+          x: {
+            title:{
+              display: true,
+              text: 'Distance from inclusion /nm'
+            }
+          },
+          y: {
+            title:{
+              display: true,
+              text: 'Monolayer thickness /nm'
+            }
+          }
+        }
+      }
     }); 
     // Perturbation coordinates
     var pertCoordData = getUforRange(document.getElementById("r0").value,document.getElementById("rstop").value,document.getElementById("rstep").value);
@@ -320,7 +391,23 @@
         backgroundColor: 'rgb(0, 255, 0)',
     },                    
     ]
-    }
+    },
+    options: {
+        scales:{
+          x: {
+            title:{
+              display: true,
+              text: 'r/nm'
+            }
+          },
+          y: {
+            title:{
+              display: true,
+              text: 'deltaG per nm /(kT/nm)'
+            }
+          }
+        }
+      }
     });
     // Energy coordinates
     fillEnergyCoordData(energyForRange);
