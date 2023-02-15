@@ -81,9 +81,8 @@
                 </tr>
                 </table>
             <button type="button" id="button_bq">Calculate &#916G<SUB>deformation</SUB></button>
-            
-            <p> This page is slow so please be patient </p>
-            <p> Loading after pressing Calculate may take a few minutes</p>
+            <p> Equation for G<SUB>def</SUB>=H<SUB>b</SUB>u<SUB>0</SUB><SUP>2</SUP>+H<SUB>x</SUB>u<SUB>0</SUB>c<SUB>0</SUB>+H<SUB>c</SUB>c<SUB>0</SUB><SUP>2</SUP></p>
+            <p> Equation for F<SUB>dis</SUB>=-H<SUB>b</SUB>u<SUB>0</SUB>-H<SUB>x</SUB>c<SUB>0</SUB></p>
             <script>
               // get Hb, Hx, Hc from local storage (output from the main application page)
               document.getElementById('Hb_bq').value=Number(localStorage.getItem('Hb')); 
@@ -106,7 +105,13 @@
                 <button class="nav-link" id="q-plot-tab" data-bs-toggle="tab" data-bs-target="#q-plot" type="button" role="tab" aria-controls="q-plot" aria-selected="false">Quadratic plots</button>
               <li class="nav-item" role="presentation">
                 <button class="nav-link" id="q-coords-tab" data-bs-toggle="tab" data-bs-target="#q-coords" type="button" role="tab" aria-controls="q-coords" aria-selected="false">Quadratic Coordinates</button>
-              </li>              
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="fdis-plot-tab" data-bs-toggle="tab" data-bs-target="#fdis-plot" type="button" role="tab" aria-controls="fdis-plot" aria-selected="false"> F<SUB>dis</SUB> plot</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="fdis-coords-tab" data-bs-toggle="tab" data-bs-target="#fdis-coords" type="button" role="tab" aria-controls="fdis-coords" aria-selected="false"> F<SUB>dis</SUB> coordinates</button>
+              </li>               
             </ul>
             <div class="tab-content" id="myTabContent">
               <div class="tab-pane fade show active" id="bq-plot" role="tabpanel" aria-labelledby="bq-plot-tab">
@@ -157,13 +162,37 @@
                   </table>
                 </div>
                 <A HREF="javascript:void(0);" class="button" id="c0CoordDL">Download c0 quadratic coordinates data </A>  
-              </div>             
+              </div>  
+              <div class="tab-pane fade" id="fdis-plot" role="tabpanel" aria-labelledby="fdis-plot-tab">
+                <p>F<SUB>dis</SUB> plot </SUB></p>
+                <div>
+                  <div id="Fdisplot"></div>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="fdis-coords" role="tabpanel" aria-labelledby="fdis-coords-tab">
+                <p>F<SUB>dis</SUB> coordinates </SUB></p>
+                <div style="width:200px; height:400px; overflow:auto;">
+                  <table id="fdisCoordTable">
+                    <tr>
+                      <th>u<SUB>0<SUB></th>
+                      <th>c<SUB>0</SUB></th>
+                      <th>F<SUB>dis</SUB></th>
+                    </tr>
+                  </table>
+                </div>
+                <A HREF="javascript:void(0);" class="button" id="fdisCoordDL">Download F<SUB>dis</SUB> coordinates data </A>
+              </div>
           </div>
           <script>
               // biquadratic function
               function bqFunction(u,c,Hb,Hx,Hc){
               var Gdef = (Hb*(u*u))+(Hx*u*c)+(Hc*(c*c));
               return(Gdef);
+              };
+
+              function FdisFunction(u,c,Hb,Hx){
+              var Fdis = (-1*Hb*(u))+(-1*Hx*c);
+              return(Fdis);
               };
 
               function quadraticEq(u0,c0,Hb,Hx,Hc){
@@ -220,6 +249,30 @@
 
               return [u0Array,u0gdefArray,c0Array,c0gdefArray];
               };
+
+              function getFdisCoords(u0Vals,u0Step,c0Vals,c0Step,Hb,Hx){
+                var u0_min=u0Vals[0];
+                var u0_max=u0Vals[1];
+                var u0_length=Math.round((u0_max-u0_min)/u0Step)+1;
+                var c0_min=c0Vals[0];
+                var c0_max=c0Vals[1];                    
+                var c0_length=Math.round((c0_max-c0_min)/c0Step)+1;
+
+                var u0Array=Array(u0_length).fill().map((u0,i) => Number(u0_min) + (i*u0Step));
+                var c0Array=Array(c0_length).fill().map((c0,j) => Number(c0_min) + (j*c0Step));                    
+                // format as array of arrays for plot
+                var u0ArrayPlot=[];
+                var c0ArrayPlot=[];
+                var FdisArray=[];
+          
+                for(let i=0;i<u0_length;i++){
+                    var currU0=u0Array[i];
+                    u0ArrayPlot.push(Array(c0Array.length).fill(currU0));
+                    c0ArrayPlot.push(c0Array);
+                    FdisArray.push(c0Array.map((c0) => FdisFunction(currU0,c0,Hb,Hx)));
+                }                
+              return [u0ArrayPlot,c0ArrayPlot,FdisArray];  
+              }
           
               //update everything when gdef calculation button is pressed
               document.getElementById('button_bq').addEventListener('click', function() {            
@@ -230,7 +283,25 @@
               // take Hb, Hx, Hc from the main html page if they are empty. Otherwise use what is there already
               var Hb_bq=document.getElementById('Hb_bq').value;
               var Hx_bq=document.getElementById('Hx_bq').value;
-              var Hc_bq=document.getElementById('Hc_bq').value;                    
+              var Hc_bq=document.getElementById('Hc_bq').value;
+              
+              //update coordinates tables, delete existing data
+              var bqCoordTableLength=document.getElementById("bqCoordTable").rows.length;
+              var u0CoordTableLength=document.getElementById("u0CoordTable").rows.length;
+              var c0CoordTableLength=document.getElementById("c0CoordTable").rows.length;
+              var fdisCoordTableLength=document.getElementById("fdisCoordTable").rows.length;
+              if(Number(bqCoordTableLength) > 1){
+                document.getElementById("bqCoordTable").innerHTML = "<tr><th>u<SUB>0</SUB></th><th>c<SUB>0</SUB></th><th>&#916G<SUB>def</SUB></th></tr>";
+              }
+              if(Number(u0CoordTableLength) > 1){
+                document.getElementById("u0CoordTable").innerHTML = "<tr><th>u<SUB>0</SUB></th><th>&#916G<SUB>def</SUB></th></tr>";
+              }
+              if(Number(c0CoordTableLength) > 1){
+                document.getElementById("c0CoordTable").innerHTML = "<tr><th>c<SUB>0</SUB></th><th>&#916G<SUB>def</SUB></th></tr>";
+              }
+              if(Number(fdisCoordTableLength) > 1){
+                document.getElementById("fdisCoordTable").innerHTML = "<tr><th>u<SUB>0</SUB></th><th>c<SUB>0</SUB></th><th>&#916G<SUB>def</SUB></th></tr>";
+              }
 
               //update plot
               var plotData=getBQCoords(u0Vals,u0Step,c0Vals,c0Step,Hb_bq,Hx_bq,Hc_bq);
@@ -275,7 +346,7 @@
               Plotly.newPlot('biquadraticplot',data,layout);     
               
               fillBiquadraticCoordDataFast(plotData);
-              downloadBlob(arrayToCSV(plotData),"biquadraticCoordDL",'biquadraticcoords.csv','text/csv;charset=utf-8;'); 
+              downloadBlob(nestedArrayToCSV(plotData),"biquadraticCoordDL",'biquadraticcoords.csv','text/csv;charset=utf-8;'); 
 
               // quadratic plots as function of single variable (u0 or c0)
               var qplotData=getQCoords(u0Vals,u0Step,c0Vals,c0Step,Hb_bq,Hx_bq,Hc_bq);
@@ -352,6 +423,53 @@
 
               fillQuadraticCoordDataFast([qplotData[2],qplotData[3]],"c0CoordTable");
               downloadBlob(arrayToCSV([qplotData[2],qplotData[3]]),"c0CoordDL",'c0quadraticcoords.csv','text/csv;charset=utf-8;'); 
+
+              // Fdis plot 
+              var fdisplotData=getFdisCoords(u0Vals,u0Step,c0Vals,c0Step,Hb_bq,Hx_bq);
+              var fdisdata = [{
+                      x: fdisplotData[0],
+                      y: fdisplotData[1],
+                      z: fdisplotData[2],
+                      type: 'surface'
+                  }];
+                          
+              var fdislayout = {
+              title: {text: 'F<SUB>dis</SUB> as function of u<SUB>0</SUB> and c<SUB>0</SUB>'},
+              scene:{
+                xaxis:{
+                  title: {
+                    text: 'u0'
+                  },
+              },
+              yaxis:{
+                  title: {
+                    text: 'c0'
+                  },
+              },
+              zaxis:{
+                  title:{
+                    text: 'Fdis',
+                    ticksuffix: 'kT/nm'
+                  },
+              },
+              },
+              autosize: false,
+              width: 800,
+              height: 800,
+              margin: {
+                  l: 65,
+                  r: 50,
+                  b: 65,
+                  t: 90,
+              }                   
+              };
+          
+              Plotly.newPlot('Fdisplot',fdisdata,fdislayout);
+
+              // Fdis coordinates
+              fillFdisCoordDataFast(fdisplotData);
+              downloadBlob(nestedArrayToCSV([fdisplotData[0],fdisplotData[1],fdisplotData[2]]),"fdisCoordDL",'Fdiscoords.csv','text/csv;charset=utf-8;');
+
               });                            
           </script>
 

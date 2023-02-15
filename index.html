@@ -192,6 +192,7 @@
                     <th>G<SUB>CE</SUB></th>
                     <th>G<SUB>SD</SUB></th>
                     <th>G<SUB>MEC</SUB></th>
+                    <th>G<SUB>ST</SUB></th>
                   </tr>
                 </table>
               </div>
@@ -224,7 +225,9 @@
     if(Math.abs(document.getElementById('c0').value)>1){
     alert("Logical values for c0 should be within range [-1,1])")
   }
-  })  
+  })
+  
+  
 
   //update parameters depending on drop-down selection
   document.getElementById('lipidParams').addEventListener('change', function() {
@@ -251,7 +254,12 @@
     this.setAttribute('oldValue',this.value);
   }
 
-  document.getElementById('Ka').addEventListener('change', function(){    
+  document.getElementById('d0').addEventListener('change',function(){
+    document.getElementById('lipidParams').value= "userlipid";
+  })
+
+  document.getElementById('Ka').addEventListener('change', function(){   
+    document.getElementById('lipidParams').value= "userlipid";
     if(document.getElementById('Kratio_box').checked){
       Ka_input=document.getElementById('Ka');
       ratio = Ka_input.value/Number(Ka_input.getAttribute('oldValue'));
@@ -260,6 +268,7 @@
     }
   })
   document.getElementById('Kc').addEventListener('change', function(){   
+    document.getElementById('lipidParams').value= "userlipid";
     if(document.getElementById('Kratio_box').checked){
       Kc_input=document.getElementById('Kc');
       ratio = Kc_input.value/Number(Kc_input.getAttribute('oldValue'));
@@ -319,13 +328,6 @@
       type: 'scatter',
       data: {
       datasets: [{
-        label: 'Membrane perturbation',
-        data: formatPertPlotData(uForRange),
-        showLine: true,
-        fill: false,
-        backgroundColor: 'rgb(255, 99, 132)'
-      },
-      {
         label: 'Inclusion',
         data: [{
           x: 0,
@@ -336,9 +338,16 @@
         }],
         showLine: true,
         fill: false,
-        backgroundColor: 'rgb(255, 0, 0)',
-        borderColor: 'rgb(255, 0, 0)'
-      }
+        backgroundColor: 'rgb(50, 50, 50)'
+      },
+      {
+        label: 'Membrane perturbation',
+        data: formatPertPlotData(uForRange),
+        showLine: true,
+        fill: false,
+        backgroundColor: 'rgb(255, 99, 132)'
+      },
+
     ]
     },
     options: {
@@ -346,7 +355,7 @@
           x: {
             title:{
               display: true,
-              text: 'Distance from inclusion /nm'
+              text: 'Distance from center of inclusion /nm'
             }
           },
           y: {
@@ -389,7 +398,15 @@
         showLine: true,
         fill: false,
         backgroundColor: 'rgb(0, 255, 0)',
-    },                    
+    },
+    {
+        label:'deltaGst',
+        data: formatEnergyPlotData(energyForRange[0],energyForRange[4]),
+        showLine: true,
+        fill: false,
+        backgroundColor: 'rgb(255,0,255)'
+
+    }                    
     ]
     },
     options: {
@@ -397,7 +414,7 @@
           x: {
             title:{
               display: true,
-              text: 'r/nm'
+              text: 'r /nm'
             }
           },
           y: {

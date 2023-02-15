@@ -1,5 +1,35 @@
-function arrayToCSV(data){
-    return data.map(row => 
+function arrayToCSV(data){    
+    var csv = [];
+    for (var i=0; i < data[0].length; i++){
+        row = []
+        for (var j=0; j < data.length; j++){
+            row.push(data[j][i]);
+        }
+        csv.push(row);
+    }
+    return csv.map(row =>
+        row
+        .map(String)
+        .map(v => v.replaceAll('"','""'))
+        .join(',')
+        ).join('\r\n');
+}
+
+function nestedArrayToCSV(data){
+    var csv = [];
+    for(var a=0; a<data.length;a++){
+        data[a]=data[a].flat();
+    }
+    // flatten all the subarrays in each array of data
+    for (var i=0; i < data[0].flat().length; i++){
+        row=[];
+        for (var j=0; j < data.length; j++){
+            row.push(data[j][i]);
+            }
+        csv.push(row);           
+    }
+        
+    return csv.map(row =>
         row
         .map(String)
         .map(v => v.replaceAll('"','""'))
@@ -329,6 +359,54 @@ function getDeltaGmec(r){
     return(res.re/changeParams)
 }
 
+function getDeltaGst(r){
+    var changeParams=4.114;
+    var imagErrorThreshold=Math.pow(10,-10)
+
+    var d0=document.getElementById("d0").value;
+    var l=document.getElementById("l").value;
+    var r0=document.getElementById("r0").value;
+    var ka=document.getElementById("Ka").value;
+    var kc=document.getElementById("Kc").value;
+    var alpha=document.getElementById("alpha").value;
+    var s=document.getElementById("s").value;
+    if(document.getElementById("sRelaxed_button").checked){
+        s=calcSmin();
+    }
+    else if(document.getElementById("sConstrained_button").checked){
+        s=0;
+    }
+    var c0=document.getElementById("c0").value;
+
+    var u0=div(sub(d0,l),2);
+
+    var u0=div(sub(d0,l),2);
+
+    var gamma=alpha/kc;
+    var beta=(4*ka)/(d0*d0*kc);
+
+    var temp=sqrt(complex((gamma*gamma)-(4*beta),0));
+    var kp2=div(add(complex(gamma,0),temp),2);
+    var kn2=div(sub(complex(gamma,0),temp),2);
+    var kp=sqrt(kp2);
+    var kn=sqrt(kn2);
+
+    // Kkpr0 and Kknr0 are arrays of length 2;
+    // array[0] is an object with the real (.re) and imaginary (.im) output of besselK order 0 
+    // array [1] is an object with the real (.re) and imaginary (.im) of besselK order 1 
+    var Kkpr=getBessel(mul(kp,r));
+    var Kknr=getBessel(mul(kn,r));
+    var Kkpr0=getBessel(mul(kp,r0));
+    var Kknr0=getBessel(mul(kn,r0));
+    var divi= sub(mul(kn,(mul(Kkpr0[0],Kknr0[1]))),mul(kp,(mul(Kknr0[0],Kkpr0[1]))));
+    var Ap=div(add(mul(kn,mul(Kknr0[1],u0)),mul(Kknr0[0],s)),divi);
+    var An=div(sub(mul(kp,mul(Kkpr0[1],-u0)),mul(Kkpr0[0],s)),divi);
+    var temp1st=mul(kp,mul(Ap,Kkpr[1]));
+    var temp2st=mul(kn,mul(An,Kknr[1]));
+    var res=mul(pow(add(temp1st,temp2st),2),(Math.PI*r*alpha));
+    return(res.re/changeParams)
+}
+
 function getEnergyDecompforRange(startR,stopR,interval){
     var i=0;
     // due to the floating numbers, this isn't always an integer
@@ -338,6 +416,7 @@ function getEnergyDecompforRange(startR,stopR,interval){
     var deltaGceArray=[];
     var deltaGsdArray=[];
     var deltaGmecArray=[];
+    var deltaGstArray=[];
     while(i<length){
         var currR;
         if(i==0){
@@ -351,12 +430,14 @@ function getEnergyDecompforRange(startR,stopR,interval){
         var currDeltaGce=getDeltaGce(currR);
         var currDeltaGsd=getDeltaGsd(currR);
         var currDeltaGmec=getDeltaGmec(currR);
+        var currDeltaGst=getDeltaGst(currR);
         deltaGceArray.push(currDeltaGce);
         deltaGsdArray.push(currDeltaGsd);
         deltaGmecArray.push(currDeltaGmec);
+        deltaGstArray.push(currDeltaGst);
         i++;
     }
-    return([rArray,deltaGceArray,deltaGsdArray,deltaGmecArray])
+    return([rArray,deltaGceArray,deltaGsdArray,deltaGmecArray,deltaGstArray])
 }
 
 function formatEnergyPlotData(getEnergyDecompOutput_r,getEnergyDecompOutputDeltaG){
@@ -376,10 +457,10 @@ function fillEnergyCoordDataFast(getEnergyDecompOutput){
     var energyCoords;
     for(var i=0; i < getEnergyDecompOutput[0].length; i++){
         if(energyCoords == undefined){
-            energyCoords="<tr><td>"+Number(getEnergyDecompOutput[0][i]).toPrecision(3)+"</td><td>"+Number(getEnergyDecompOutput[1][i]).toPrecision(5)+"</td><td>"+Number(getEnergyDecompOutput[2][i]).toPrecision(5)+"</td><td>"+Number(getEnergyDecompOutput[3][i]).toPrecision(5)+"</td></tr>"
+            energyCoords="<tr><td>"+Number(getEnergyDecompOutput[0][i]).toPrecision(3)+"</td><td>"+Number(getEnergyDecompOutput[1][i]).toPrecision(5)+"</td><td>"+Number(getEnergyDecompOutput[2][i]).toPrecision(5)+"</td><td>"+Number(getEnergyDecompOutput[3][i]).toPrecision(5)+"</td><td>"+Number(getEnergyDecompOutput[4][i]).toPrecision(5)+"</td></tr>"
         }
         else{
-            energyCoords+="<tr><td>"+Number(getEnergyDecompOutput[0][i]).toPrecision(3)+"</td><td>"+Number(getEnergyDecompOutput[1][i]).toPrecision(5)+"</td><td>"+Number(getEnergyDecompOutput[2][i]).toPrecision(5)+"</td><td>"+Number(getEnergyDecompOutput[3][i]).toPrecision(5)+"</td></tr>"
+            energyCoords+="<tr><td>"+Number(getEnergyDecompOutput[0][i]).toPrecision(3)+"</td><td>"+Number(getEnergyDecompOutput[1][i]).toPrecision(5)+"</td><td>"+Number(getEnergyDecompOutput[2][i]).toPrecision(5)+"</td><td>"+Number(getEnergyDecompOutput[3][i]).toPrecision(5)+"</td><td>"+Number(getEnergyDecompOutput[4][i]).toPrecision(5)+"</td></tr>"
         }
     }
     document.getElementById("energyCoordTable").innerHTML+=energyCoords;
@@ -476,56 +557,6 @@ function fillCurvatureCoordDataFast(getCurvatureOutput){
     document.getElementById("curvatureTable").innerHTML+=curvatureCoords;
 }
 
-function getdeltaGdef_old(){
-var changeParams=4.114;
-var imagErrorThreshold=Math.pow(10,-10)
-
-var d0=document.getElementById("d0").value;
-var l=document.getElementById("l").value;
-var r0=document.getElementById("r0").value;
-var ka=document.getElementById("Ka").value;
-var kc=document.getElementById("Kc").value;
-var alpha=document.getElementById("alpha").value;
-var s=document.getElementById("s").value;
-if(document.getElementById("sRelaxed_button").checked){
-    s=calcSmin();
-}
-else if(document.getElementById("sConstrained_button").checked){
-    s=0;
-}
-var c0=document.getElementById("c0").value;
-
-var u0=div(sub(d0,l),2);
-
-var gamma=alpha/kc;
-var beta=(4*ka)/(d0*d0*kc);
-
-var temp=sqrt(complex((gamma*gamma)-(4*beta),0));
-var kp2=div(add(complex(gamma,0),temp),2);
-var kn2=div(sub(complex(gamma,0),temp),2);
-var kp=sqrt(kp2);
-var kn=sqrt(kn2);
-
-// Kkpr0 and Kknr0 are arrays of length 2;
-// array[0] is an object with the real (.re) and imaginary (.im) output of besselK order 0 
-// array [1] is an object with the real (.re) and imaginary (.im) of besselK order 1 
-var Kkpr0=getBessel(mul(kp,r0));
-var Kknr0=getBessel(mul(kn,r0));
-var divi= sub(mul(kn,(mul(Kkpr0[0],Kknr0[1]))),mul(kp,(mul(Kknr0[0],Kkpr0[1]))));
-var Ap=div(add(mul(kn,mul(Kknr0[1],u0)),mul(Kknr0[0],s)),divi);
-var An=div(sub(mul(kp,mul(Kkpr0[1],-u0)),mul(Kkpr0[0],s)),divi);
-
-final_temp=mul(add(mul(Ap,mul(kp2,Kkpr0[0])),mul(An,mul(kn2,Kknr0[0]))),s);
-final_temp=add(final_temp,mul(add(mul(Ap,mul(kp,mul(kp2,Kkpr0[1]))),mul(An,mul(kn,mul(kn2,Kknr0[1])))),u0));
-final_temp=add(final_temp,mul(mul(gamma,u0),s));
-res=mul(mul(final_temp,(-Math.PI)),mul(r0,kc));
-res=div(res,changeParams);
-return(res);
-//return(final_temp);
-// if (abs(imag(res))>imagErrorThreshold) {throw new Exception("Error the free energy has a non zero imaginary part of=" + imag(res));}
-// return re(res)/changeParams;
-}
-
 function curvature_Analytical(){
 var d0=document.getElementById("d0").value;
 var l=document.getElementById("l").value;
@@ -599,37 +630,6 @@ res=div(res,changeParams);
 return([a1,a2,a3,Hb,Hx,Hc,smin,res]);
 }
 
-function biquadratic(){
-var d0 = 2.75;
-//var d0=document.getElementById("d0").value;
-var l=document.getElementById("l").value;
-var r0=document.getElementById("r0").value;
-//var ka=document.getElementById("Ka").value;
-var ka=265;
-ka = 4*ka;
-//var kc=document.getElementById("Kc").value;
-var kc=85;
-//var alpha=document.getElementById("alpha").value;
-var s=document.getElementById("s").value;
-var c0=document.getElementById("c0").value;
-
-var u0=div(sub(d0,l),2);
-
-Hb=re(curvature_Analytical()[3]);
-Hx=re(curvature_Analytical()[4]);
-Hc=re(curvature_Analytical()[5]);
-biquadratic_eq=(Hb*u0*u0)+(Hx*u0*c0)+(Hc*c0*c0);
-
-function quadratic_u0(){
-    u0_p=((-1*Hx*c0)+sqrt((Hx*c0*Hx*c0)-(4*Hb*Hc*c0*c0)))/(2*Hb);
-    u0_n=((-1*Hx*c0)-sqrt((Hx*c0*Hx*c0)-(4*Hb*Hc*c0*c0)))/(2*Hb);
-    return([u0_p,u0_n])
-}
-quadratic_u0_out=quadratic_u0();
-return(Hb);
-return([biquadratic_eq,quadratic_u0_out[0],quadratic_u0_out[1]]);
-}
-
 function fillBiquadraticCoordData(getBiquadraticOutput){
     for(var i=0; i < getBiquadraticOutput[0].length; i++){
         var currArray = getBiquadraticOutput[0][i];
@@ -674,10 +674,22 @@ function fillQuadraticCoordDataFast(getURangeOutput,tableName){
     document.getElementById(tableName).innerHTML+=quadraticCoords;
 }
 
-//console.log(getdeltaGdef_old());
-//console.log(mul(getdeltaGdef_old()[0],getdeltaGdef_old()[0]));
-//console.log(getdeltaGdef_old().re);
-//console.log(getdeltaGdef_old().im);
+function fillFdisCoordDataFast(getFdisOutput){
+    var FdisCoords;
+    for(var i=0; i < getFdisOutput[0].length; i++){
+        var currArray = getFdisOutput[0][i];
+        for(var j=0; j<currArray.length;j++){
+            if(FdisCoords == undefined){
+                FdisCoords="<tr><td>"+Number(getFdisOutput[0][i][j]).toPrecision(3)+"</td><td>"+Number(getFdisOutput[1][i][j]).toPrecision(3)+"</td><td>"+Number(getFdisOutput[2][i][j]).toPrecision(5)+"</td></tr>";
+            }
+            else{
+                FdisCoords+="<tr><td>"+Number(getFdisOutput[0][i][j]).toPrecision(3)+"</td><td>"+Number(getFdisOutput[1][i][j]).toPrecision(3)+"</td><td>"+Number(getFdisOutput[2][i][j]).toPrecision(5)+"</td></tr>";
+            }
+        }
+    }
+    document.getElementById("fdisCoordTable").innerHTML+=FdisCoords;
+}
+
 //console.log("a1:",curvature_Analytical()[0]);
 //console.log("a2:",curvature_Analytical()[1]);
 //console.log("a3:",curvature_Analytical()[2]);
