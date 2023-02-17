@@ -307,14 +307,10 @@
     var pertCoordsTableLength=document.getElementById("pertCoordTable").rows.length;
     var energyCoordsTableLength=document.getElementById("energyCoordTable").rows.length;
     if(Number(pertCoordsTableLength) > 1){
-        while(Number(document.getElementById("pertCoordTable").rows.length)>1){
-            document.getElementById("pertCoordTable").deleteRow(1);
-        }
+      document.getElementById("pertCoordTable").innerHTML = "<tr><th>r</th><th>u</th></tr>";
     }
     if(Number(energyCoordsTableLength) > 1){
-        while(Number(document.getElementById("energyCoordTable").rows.length)>1){
-            document.getElementById("energyCoordTable").deleteRow(1);
-        }
+      document.getElementById("energyCoordTable").innerHTML = "<tr><th>r</th><th>G<SUB>CE</SUB></th><th>G<SUB>SD</SUB></th><th>G<SUB>MEC</SUB></th><th>G<SUB>ST</SUB></th></tr>";
     }
     //Perturbation plot
     var l=document.getElementById('l').value;
